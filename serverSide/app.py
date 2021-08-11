@@ -1,31 +1,26 @@
 from flask import Flask, request, jsonify
-from flask_sqlalchemy import SQLAlchemy 
 from flask_marshmallow import Marshmallow, fields
+from db_sqlalchemy import db_sqlalchemy
+from models.ToDoItem import ToDoItem
 
 app = Flask(__name__)
 
 #Configuración MySQL
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root@localhost/flaskSQL'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False 
-
-db = SQLAlchemy(app)
-ma = Marshmallow(app)
-
-class ToDoItem(db.Model):
-    id = db.Column(db.Integer, primary_key = True)
-    title = db.Column(db.String(90), unique=True)
-
-    def __init__(self, title):
-        self.title = title 
+db_sqlalchemy.init_app(app)
 
 #Creación de tablas
-db.create_all()
+with app.app_context():
+    db_sqlalchemy.create_all()
+
+ma = Marshmallow(app)
 
 #Schema de interacción
 class ToDoItemSchema(ma.Schema):
     #title = fields.String()
     class Meta:
-        fields = ('id', 'title')
+        fields = ('id', 'title', 'completed')
 
 #Variables de Schema
 toDoItem_schema = ToDoItemSchema()
@@ -40,44 +35,32 @@ def index():
 
 @app.route('/tasks', methods=['POST'])
 def create_todoItem():
-    #request.json devuelve los datos que envia el cliente.
     title = request.json['title']
-    new_toDoItem = ToDoItem(title)
-    db.session.add(new_toDoItem)
-    db.session.commit()
-
-    return toDoItem_schema.jsonify(new_toDoItem)
-
+    completed = request.json['completed']
+    newItem = ToDoItem.createNewItem(title, completed)
+    return toDoItem_schema.jsonify(newItem)
 
 @app.route('/tasks', methods=['GET'])
 def get_all_toDoItems():
-    toDoItems = ToDoItem.query.all()
-    return jsonify(toDoItems_schema.dump(toDoItems))
+    return jsonify(toDoItems_schema.dump(ToDoItem.getAllItems()))
 
 @app.route('/tasks/<id>', methods=['GET'])
 def get_toDoItem(id):
-    toDoItem = ToDoItem.query.get(id)
-    return toDoItem_schema.jsonify(toDoItem)
+    return toDoItem_schema.jsonify(ToDoItem.searchItemById(id))
 
 @app.route('/tasks/<id>', methods=['GET','PUT'])
 def update_toDoItem(id):
-    toDoItemUpdate = ToDoItem.query.get(id)
+    
+    toDoItemUpdate = ToDoItem.searchItemById(id)
     newTitle = request.json['title']
-
-    toDoItemUpdate.title = newTitle
-
-    db.session.commit()
-
+    newCompleted = request.json['completed']
+    toDoItemUpdate.updateTitle(newTitle, newCompleted)
     return toDoItem_schema.jsonify(toDoItemUpdate)
 
 @app.route('/tasks/<id>', methods=['DELETE'])
 def delete_toDoItem(id):
-    toDoItemDelete = ToDoItem.query.get(id)
-    db.session.delete(toDoItemDelete)
-    db.session.commit()
-
+    toDoItemDelete = ToDoItem.deleteItemById(id)
     return toDoItem_schema.jsonify(toDoItemDelete)
-
 
 if __name__ == "__main__":
     app.run(debug=True)
