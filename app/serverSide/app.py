@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy 
 from flask_marshmallow import Marshmallow, fields
 
@@ -32,6 +32,12 @@ toDoItem_schema = ToDoItemSchema()
 toDoItems_schema = ToDoItemSchema(many=True)
 
 #Rutas
+@app.route('/', methods=['GET'])
+def index():
+    return jsonify({
+        'Message' : 'Hi, welcome to my API'
+    })
+
 @app.route('/tasks', methods=['POST'])
 def create_todoItem():
     #request.json devuelve los datos que envia el cliente.
@@ -41,6 +47,36 @@ def create_todoItem():
     db.session.commit()
 
     return toDoItem_schema.jsonify(new_toDoItem)
+
+
+@app.route('/tasks', methods=['GET'])
+def get_all_toDoItems():
+    toDoItems = ToDoItem.query.all()
+    return jsonify(toDoItems_schema.dump(toDoItems))
+
+@app.route('/tasks/<id>', methods=['GET'])
+def get_toDoItem(id):
+    toDoItem = ToDoItem.query.get(id)
+    return toDoItem_schema.jsonify(toDoItem)
+
+@app.route('/tasks/<id>', methods=['GET','PUT'])
+def update_toDoItem(id):
+    toDoItemUpdate = ToDoItem.query.get(id)
+    newTitle = request.json['title']
+
+    toDoItemUpdate.title = newTitle
+
+    db.session.commit()
+
+    return toDoItem_schema.jsonify(toDoItemUpdate)
+
+@app.route('/tasks/<id>', methods=['DELETE'])
+def delete_toDoItem(id):
+    toDoItemDelete = ToDoItem.query.get(id)
+    db.session.delete(toDoItemDelete)
+    db.session.commit()
+
+    return toDoItem_schema.jsonify(toDoItemDelete)
 
 
 if __name__ == "__main__":
