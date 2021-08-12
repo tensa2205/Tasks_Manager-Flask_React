@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
+import Form from 'react-bootstrap/Form';
 
 import { TodoRows } from './ToDoRows';
 
@@ -21,6 +22,23 @@ export class TodoList extends Component{
     handleShowModal  = () => this.setState({toggleModal : true});
     handleCloseModal = () => this.setState({toggleModal : false});
 
+    //Modifica el valor de newTodo mientras se escribe en el form.
+    updateValue = (event) =>{
+        this.setState({ newTodo: event.target.value })
+    }
+
+    newTodo = () => {
+
+        //Agrega un nuevo item a todoItems
+        this.setState({
+          todoItems: [
+            ...this.state.todoItems,
+            { action: this.state.newTodo, done:false},
+          ]
+        });
+        this.handleCloseModal();
+      }
+
     toggleDone = (todo) =>
         this.setState({
         //Cambia el estado todoItems actualizandolo cuando se presiona el checkbox
@@ -36,8 +54,8 @@ export class TodoList extends Component{
 
     render = () => (
         <div className="col-12">
-            <Button variant="primary" onClick={this.handleShowModal}>
-                Launch static backdrop modal
+            <Button variant="success"  onClick={this.handleShowModal}>
+                Create a new task
             </Button>
 
             <Modal
@@ -46,18 +64,30 @@ export class TodoList extends Component{
                 backdrop="static"
                 keyboard={false}
             >
-                <Modal.Header closeButton>
-                    <Modal.Title>Modal title</Modal.Title>
+                <Modal.Header>
+                    <Modal.Title>Task creation</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    I will not close if you click outside me. Don't even try to press
-                    escape key.
+                    <Form>
+                        <Form.Group className="mb-3" controlId="formTask">
+                            <Form.Label>
+                                Task name
+                            </Form.Label>
+                            <Form.Control
+                                as='input' 
+                                type="text" 
+                                placeholder="enter a task name"
+                                value={this.state.newTodo}
+                                onChange={this.updateValue}
+                            />     
+                        </Form.Group>
+                    </Form>
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={this.handleCloseModal}>
-                        Close
+                        Cancel
                     </Button>
-                    <Button variant="primary">Understood</Button>
+                    <Button variant="primary" onClick={this.newTodo}>Save</Button>
                 </Modal.Footer>
             </Modal>
       
