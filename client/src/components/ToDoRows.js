@@ -1,6 +1,7 @@
 import React,{Component} from 'react';
 
 export class TodoRows extends Component {
+    /* Probablemente innecesario
     //Contenido nuevo para empezar a separar en más componentes
     constructor(props){
         super(props);
@@ -12,6 +13,7 @@ export class TodoRows extends Component {
         }
     }
     //Fin contenido nuevo
+    */
     render = () => (
           <tr>
             <td>{this.props.item.action}</td>

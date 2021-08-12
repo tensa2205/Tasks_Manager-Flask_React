@@ -2,6 +2,8 @@ import React, {Component} from 'react';
 //Importa componentes
 import { Navbar } from './components/Navbar';
 import { TodoRows } from './components/ToDoRows';
+import { TodoList } from './components/ToDoList';
+
 
 export default class App extends Component {
 
@@ -22,19 +24,6 @@ export default class App extends Component {
     }
   }
 
-  toggleDone = (todo) =>
-    this.setState({
-      //Cambia el estado todoItems actualizandolo cuando se presiona el checkbox
-      todoItems: this.state.todoItems.map((item) =>
-        item.action === todo.action ? { ...item, done: !item.done} :item 
-      ), //Si el item actual en la iteración es el que recibo por parámetro, entonces cambio el estado del checkbox, sino lo dejo como está 
-    });
-
-  todoRows = () =>
-    this.state.todoItems.map((item) =>(
-      <TodoRows key={item.action} item={item} callback={this.toggleDone}/>
-    ));
-
   updateValue = (event) =>{
     this.setState({ newTodo: event.target.value })
   }
@@ -49,16 +38,17 @@ export default class App extends Component {
       ]
     })
   }
-/* FUNCIÓN MALA
-  getLengthRemainingTasks = () => {
-    this.state.todoItems.filter( (item) => !item.done ).length;
-  }
-*/
+
   render = () => (
     <div className="container">
       <div className="row">
 
+        {
+          //NAVBAR COMPONENT
+        }
         <Navbar name={this.state.userName} remainingTasks={this.state.remainingTasksLength}/>
+
+        { /* INPUTFORM
         <div className="col-12">
           <input 
             className="form-control" 
@@ -69,6 +59,14 @@ export default class App extends Component {
             Add
           </button>
         </div>
+         */
+        } 
+        {
+          //TODOLIST COMPONENT
+        }
+
+        <TodoList />
+        {/* Forma parte del nuevo todolist.js
         <div className="col-12">
           <table className="table">
             <thead>
@@ -80,6 +78,7 @@ export default class App extends Component {
             <tbody>{this.todoRows()}</tbody>
           </table>
         </div>
+      */}
       </div>
     </div>
   );
