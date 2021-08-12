@@ -1,19 +1,9 @@
 import React,{Component} from 'react';
+import Button from 'react-bootstrap/Button';
 
 export class TodoRows extends Component {
-    /* Probablemente innecesario
-    //Contenido nuevo para empezar a separar en más componentes
-    constructor(props){
-        super(props);
+    removeTodo = (item) => this.props.deleteTodoItemCallback(item);
 
-        this.state = {
-            todoItems : [
-                {action: 'Test Task', completed: false},
-            ],
-        }
-    }
-    //Fin contenido nuevo
-    */
     render = () => (
           <tr>
             <td>{this.props.item.action}</td>
@@ -21,8 +11,13 @@ export class TodoRows extends Component {
               <input
                 type="checkbox"
                 checked={this.props.item.done}
-                onChange={() => this.props.callback(this.props.item)}
+                onChange={() => this.props.toggleDoneCallback(this.props.item)}
               />
+            </td>
+            <td>
+                <Button variant="danger" size='sm' onClick={() => {this.removeTodo(this.props.item)}}>
+                    Delete
+                </Button>
             </td>
           </tr>
     );
