@@ -1,1 +1,1 @@
-# ToDo-list application with Flask + React
+# ToDo-list application using Flask and React
