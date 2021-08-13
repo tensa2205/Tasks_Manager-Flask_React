@@ -65,7 +65,15 @@ def update_toDoItem(id):
     newTitle = request.json['title']
     newCompleted = request.json['completed']
     toDoItemUpdate.updateTitle(newTitle, newCompleted)
-    return toDoItem_schema.jsonify(toDoItemUpdate)
+    return get_all_toDoItems()
+
+@app.route('/tasks_modify_completed/<id>', methods=['GET','PUT'])
+@cross_origin()
+def update_completed_toDoItem(id):
+    
+    toDoItemUpdate = ToDoItem.searchItemById(id)
+    toDoItemUpdate.negateCompleted()
+    return get_all_toDoItems()
 
 @app.route('/tasks/delete/<id>', methods=['DELETE', 'GET'])
 @cross_origin()

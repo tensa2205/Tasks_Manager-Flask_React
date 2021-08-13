@@ -14,6 +14,10 @@ class ToDoItem(db.Model):
         self.completed = newCompletedStage
 
         db.session.commit()
+    
+    def negateCompleted(self):
+        self.completed = int(not self.completed)
+        db.session.commit()
 
     @classmethod
     def createNewItem(cls, title, completed):

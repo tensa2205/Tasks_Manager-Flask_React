@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
-import { v4 as uuidv4 } from 'uuid';
 import axios from 'axios';
 
 import { TodoRows } from './ToDoRows';
@@ -24,10 +23,14 @@ export class TodoList extends Component{
             //Para el modal de edición
             toggleEditModal : false,
             updateTodo : '',
+
+            todoTitle : '',
+            updatedCompleted : ''
         }
 
         //Quisiera saber bién para que funciona esto
         this.deleteTodoItem = this.deleteTodoItem.bind(this);
+        this.toggleDone = this.toggleDone.bind(this);
     }
 
     //Manejador para cierre-apertura de Modal de creación
@@ -38,7 +41,7 @@ export class TodoList extends Component{
     handleShowEditModal = (item) => this.setState({updateTodo : item, toggleEditModal : true});
     handleCloseEditModal = () => this.setState({updateTodo: '', toggleEditModal : false});
 
-    //REST
+    //API REST
     async getItems(){
         try{
             const getResponse = await axios.get('http://localhost:5000/tasks');
@@ -66,11 +69,23 @@ export class TodoList extends Component{
     }
 
     async deleteTask(idDelete){
-        let response = await axios.delete(`http://localhost:5000/tasks/delete/${ idDelete}`)
+        let response = await axios.delete(`http://localhost:5000/tasks/delete/${ idDelete}`);
         return response;
     }
 
-    //END REST
+    async updateTask(){
+        let response = await axios.put(`http://localhost:5000/tasks/${ this.state.updateTodo.id}`,{
+            title: this.state.newTodo,
+            completed: this.state.updateTodo.completed
+        });
+        return response;
+    }
+
+    async updateCompleted(idUpdate){
+        let response = await axios.put(`http://localhost:5000/tasks_modify_completed/${ idUpdate}`);
+        return response;
+    }
+    //END API REST
     
     
     
@@ -86,22 +101,23 @@ export class TodoList extends Component{
         //Agrega un nuevo item a todoItems
         this.setState({
             todoItems: responseFromFunction.data,
+            newTodo : ''
         })
         this.handleCloseModal();
         
     }
       
-
-    //ADD AXIOS
-    toggleDone = (todo) =>
+    //Cambia el estado todoItems actualizandolo cuando se presiona el checkbox
+    async toggleDone(todo){
+        let toggleResponse = await this.updateCompleted(todo.id);
+        
         this.setState({
-        //Cambia el estado todoItems actualizandolo cuando se presiona el checkbox
-        todoItems: this.state.todoItems.map((item) =>
-            item.id === todo.id ? { ...item, done: !item.done} :item 
-        ), //Si el item actual en la iteración es el que recibo por parámetro, entonces cambio el estado del checkbox, sino lo dejo como está 
-    });
+            todoItems: toggleResponse.data
+        });
+    }
 
-    //ADD AXIOS
+
+
     async deleteTodoItem(todo){
         let responseFromFunction = await this.deleteTask(todo.id);
 
@@ -110,12 +126,13 @@ export class TodoList extends Component{
         });
     }
     
-    //ADD AXIOS
-    updateTodoItem = () => {
+    async updateTodoItem(){
+        let responseFromFunction = await this.updateTask();
+
         this.setState({
-            todoItems: this.state.todoItems.map( (item) => item.id === this.state.updateTodo.id ? {...item, action: this.state.newTodo} :item),
-            newTodo: '',
-        });
+            todoItems: responseFromFunction.data
+        })
+        
         this.handleCloseEditModal();
     }
 
@@ -186,7 +203,7 @@ export class TodoList extends Component{
                             <Form.Control
                                 as='input' 
                                 type="text" 
-                                placeholder={this.state.updateTodo.action}
+                                placeholder={this.state.updateTodo.title}
                                 value={this.state.newTodo}
                                 onChange={this.updateValue}
                             />     
@@ -197,7 +214,7 @@ export class TodoList extends Component{
                     <Button variant="secondary" onClick={this.handleCloseEditModal}>
                         Cancel
                     </Button>
-                    <Button variant="primary" onClick={this.updateTodoItem}>Save changes</Button>
+                    <Button variant="primary" onClick={() => {this.updateTodoItem()}}>Save changes</Button>
                 </Modal.Footer>
             </Modal>
       

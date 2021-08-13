@@ -4,6 +4,7 @@ import Button from 'react-bootstrap/Button';
 export class TodoRows extends Component {
     removeTodo = (item) => this.props.deleteTodoItemCallback(item);
     editTodo = (item) => this.props.showEditModalCallback(item);
+    editCompleted = (item) => this.props.toggleDoneCallback(item);
 
     render = () => (
           <tr>
@@ -12,7 +13,7 @@ export class TodoRows extends Component {
               <input
                 type="checkbox"
                 checked={this.props.item.completed}
-                onChange={() => this.props.toggleDoneCallback(this.props.item)}
+                onChange={() => this.editCompleted(this.props.item)}
               />
             </td>
             <td>
