@@ -3,6 +3,7 @@ import Button from 'react-bootstrap/Button';
 
 export class TodoRows extends Component {
     removeTodo = (item) => this.props.deleteTodoItemCallback(item);
+    editTodo = (item) => this.props.showEditModalCallback(item);
 
     render = () => (
           <tr>
@@ -17,6 +18,11 @@ export class TodoRows extends Component {
             <td>
                 <Button variant="danger" size='sm' onClick={() => {this.removeTodo(this.props.item)}}>
                     Delete
+                </Button>
+            </td>
+            <td>
+                <Button variant="info" size='sm' onClick={() => {this.editTodo(this.props.item)}}>
+                    Edit
                 </Button>
             </td>
           </tr>

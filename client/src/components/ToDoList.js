@@ -20,16 +20,24 @@ export class TodoList extends Component{
                 {id: '2', action: 'Task Example N2', done: true},
             ],
             newTodo : '',
+            //Para el modal de creación
             toggleModal : false,
+            //Para el modal de edición
+            toggleEditModal : false,
+            updateTodo : '',
         }
 
         //Quisiera saber bién para que funciona esto
         this.deleteTodoItem = this.deleteTodoItem.bind(this);
     }
 
-    //Manejador para cierre-apertura de Modal
+    //Manejador para cierre-apertura de Modal de creación
     handleShowModal  = () => this.setState({toggleModal : true});
     handleCloseModal = () => this.setState({toggleModal : false});
+
+    //Manejador para cierre-apertura de Modal de edición
+    handleShowEditModal = (item) => this.setState({updateTodo : item, toggleEditModal : true});
+    handleCloseEditModal = () => this.setState({updateTodo: '', toggleEditModal : false});
 
     //Modifica el valor de newTodo mientras se escribe en el form.
     updateValue = (event) =>{
@@ -61,18 +69,30 @@ export class TodoList extends Component{
         this.setState({
             todoItems: this.state.todoItems.filter((item) => item.id !== todo.id)
         });
+    
+    updateTodoItem = () => {
+        this.setState({
+            todoItems: this.state.todoItems.map( (item) => item.id === this.state.updateTodo.id ? {...item, action: this.state.newTodo} :item),
+            newTodo: '',
+        });
+        this.handleCloseEditModal();
+    }
 
     todoRows = () =>
     this.state.todoItems.map((item) =>(
-      <TodoRows key={item.id} item={item} toggleDoneCallback={this.toggleDone} deleteTodoItemCallback={this.deleteTodoItem}/>
+      <TodoRows key={item.id} item={item} toggleDoneCallback={this.toggleDone} deleteTodoItemCallback={this.deleteTodoItem} showEditModalCallback={this.handleShowEditModal}/>
     ));
 
     render = () => (
         <div className="col-12">
+
+
+            {/* Botón que habilita la creación de una nueva tarea -> Modal */}
             <Button variant="success"  onClick={this.handleShowModal}>
                 Create a new task
             </Button>
 
+            {/* Modal de creación */}
             <Modal
                 show={this.state.toggleModal}
                 onHide={this.handleCloseModal}
@@ -105,13 +125,46 @@ export class TodoList extends Component{
                     <Button variant="primary" onClick={this.newTodo}>Save</Button>
                 </Modal.Footer>
             </Modal>
+
+            {/*Modal para modificación */}
+            <Modal
+                show={this.state.toggleEditModal}
+                onHide={this.handleCloseEditModal}
+                backdrop="static"
+                keyboard={false}
+            >
+                <Modal.Header>
+                    <Modal.Title>Edit task</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Form>
+                        <Form.Group className="mb-3" controlId="formTask">
+                            <Form.Label>
+                                New task name
+                            </Form.Label>
+                            <Form.Control
+                                as='input' 
+                                type="text" 
+                                placeholder={this.state.updateTodo.action}
+                                value={this.state.newTodo}
+                                onChange={this.updateValue}
+                            />     
+                        </Form.Group>
+                    </Form>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={this.handleCloseEditModal}>
+                        Cancel
+                    </Button>
+                    <Button variant="primary" onClick={this.updateTodoItem}>Save changes</Button>
+                </Modal.Footer>
+            </Modal>
       
           <table className="table">
             <thead>
               <tr>
                 <th>Task</th>
                 <th>Completed</th>
-                <th>Options</th>
               </tr>
             </thead>
             <tbody>{this.todoRows()}</tbody>
