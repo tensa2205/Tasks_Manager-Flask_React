@@ -3,8 +3,10 @@ import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import { v4 as uuidv4 } from 'uuid';
+import axios from 'axios';
 
 import { TodoRows } from './ToDoRows';
+
 
 export class TodoList extends Component{
 
@@ -15,10 +17,7 @@ export class TodoList extends Component{
         super(props);
 
         this.state = {
-            todoItems : [
-                {id: '1', action: 'Task Example N1' , done: false},
-                {id: '2', action: 'Task Example N2', done: true},
-            ],
+            todoItems : [],
             newTodo : '',
             //Para el modal de creación
             toggleModal : false,
@@ -39,24 +38,61 @@ export class TodoList extends Component{
     handleShowEditModal = (item) => this.setState({updateTodo : item, toggleEditModal : true});
     handleCloseEditModal = () => this.setState({updateTodo: '', toggleEditModal : false});
 
+    //REST
+    async getItems(){
+        try{
+            const getResponse = await axios.get('http://localhost:5000/tasks');
+            return getResponse;
+        } catch(error){
+            console.error(error);
+        }
+    }
+
+    async componentDidMount(){
+        let tasksResponse = await this.getItems();
+        if (tasksResponse){
+            this.setState({
+                todoItems: tasksResponse.data,
+            })
+        }
+    }
+
+     async postNewTask(){
+         let response = await axios.post('http://localhost:5000/tasks_create', {
+            title: this.state.newTodo,
+            completed: 0
+          });
+          return response;
+    }
+
+    async deleteTask(idDelete){
+        let response = await axios.delete(`http://localhost:5000/tasks/delete/${ idDelete}`)
+        return response;
+    }
+
+    //END REST
+    
+    
+    
     //Modifica el valor de newTodo mientras se escribe en el form.
     updateValue = (event) =>{
         this.setState({ newTodo: event.target.value })
     }
 
-    //Agrega un nuevo item a todoItems
-    newTodo = () => {
 
+    //Agrega un nuevo item a todoItems
+    async newTodo() {
+        let responseFromFunction = await this.postNewTask();
         //Agrega un nuevo item a todoItems
         this.setState({
-          todoItems: [
-            ...this.state.todoItems,
-            {id: uuidv4(), action: this.state.newTodo, done:false},
-          ]
-        });
+            todoItems: responseFromFunction.data,
+        })
         this.handleCloseModal();
-      }
+        
+    }
+      
 
+    //ADD AXIOS
     toggleDone = (todo) =>
         this.setState({
         //Cambia el estado todoItems actualizandolo cuando se presiona el checkbox
@@ -65,11 +101,16 @@ export class TodoList extends Component{
         ), //Si el item actual en la iteración es el que recibo por parámetro, entonces cambio el estado del checkbox, sino lo dejo como está 
     });
 
-    deleteTodoItem = (todo) =>
+    //ADD AXIOS
+    async deleteTodoItem(todo){
+        let responseFromFunction = await this.deleteTask(todo.id);
+
         this.setState({
-            todoItems: this.state.todoItems.filter((item) => item.id !== todo.id)
+            todoItems: responseFromFunction.data
         });
+    }
     
+    //ADD AXIOS
     updateTodoItem = () => {
         this.setState({
             todoItems: this.state.todoItems.map( (item) => item.id === this.state.updateTodo.id ? {...item, action: this.state.newTodo} :item),
@@ -122,7 +163,7 @@ export class TodoList extends Component{
                     <Button variant="secondary" onClick={this.handleCloseModal}>
                         Cancel
                     </Button>
-                    <Button variant="primary" onClick={this.newTodo}>Save</Button>
+                    <Button variant="primary" onClick={() => {this.newTodo()}}>Save</Button>
                 </Modal.Footer>
             </Modal>
 

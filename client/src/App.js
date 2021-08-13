@@ -6,6 +6,7 @@ import { TodoList } from './components/ToDoList';
 
 export default class App extends Component {
 
+  //Borrar constructor y las cosas raras q le mando al navbar
   constructor(props){
     super(props);
 
