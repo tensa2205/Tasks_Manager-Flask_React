@@ -2,9 +2,28 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+## First, install NodeJS 
+
+### Linux
+- On a linux terminal:
+ ```bash
+ sudo apt install nodejs
+ ```
+- Verify installation with:
+ ```bash
+ > node -v or node --version
+ ```
+
+### MacOS
+- Download [macOS installer file](https://nodejs.org/en/download/) (.pkg) and install.
+
+### Windows
+- Download [Windows installer file]((https://nodejs.org/en/download/)) and install.
+
+
 ## Available Scripts
 
-In the project directory, you can run:
+In the project (client) directory, you can run:
 
 ### `npm start`
 
