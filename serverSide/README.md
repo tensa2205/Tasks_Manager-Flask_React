@@ -1,5 +1,5 @@
-## How to run the project.
-> - In order to run the project, you must have Python and Pip. I recommend Python 3.8.10 because that's the one i'm using.
+## How to run flask.
+> - In order to run Flask, you must have Python, Pip, XAMPP, a virtual environment with all dependencies installed. I recommend Python 3.8.10 because that's the one i'm using.
 
 ### Python installation
 **Windows and MacOS users**
@@ -31,6 +31,30 @@
     ```bash
     python3 --version
     ```
+   
+
+### XAMPP installation
+ **Windows users**
+ - Download from the following [link](https://www.apachefriends.org/download.html) and install.
+
+ **MacOS users**
+ - Download from the following [link](https://www.apachefriends.org/download.html) and install.
+
+ **Linux users**
+ 1. Download from the following [link](https://www.apachefriends.org/download.html).
+ 2. Move to Downloads folder by using the following command:
+      ```bash
+      cd /home/[username]/Downloads
+      ```
+ 3. Add permissions to the package to make it executable
+      ```bash
+      chmod 755 [package name]
+      ```
+ 4. Launch the setup wizard as root
+      ```bash
+      sudo ./[package name]
+      ```
+ 5. Go through the graphical setup to install.
 
  ### PIP installation
  **Windows users**
