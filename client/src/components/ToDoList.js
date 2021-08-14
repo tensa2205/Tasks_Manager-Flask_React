@@ -35,11 +35,11 @@ export class TodoList extends Component{
 
     //Manejador para cierre-apertura de Modal de creación
     handleShowModal  = () => this.setState({toggleModal : true});
-    handleCloseModal = () => this.setState({toggleModal : false});
+    handleCloseModal = () => this.setState({toggleModal : false, newTodo: ''});
 
     //Manejador para cierre-apertura de Modal de edición
     handleShowEditModal = (item) => this.setState({updateTodo : item, toggleEditModal : true});
-    handleCloseEditModal = () => this.setState({updateTodo: '', toggleEditModal : false});
+    handleCloseEditModal = () => this.setState({updateTodo: '', toggleEditModal : false, newTodo: ''});
 
     //API REST
     async getItems(){
